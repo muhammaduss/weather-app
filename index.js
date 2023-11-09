@@ -12,16 +12,14 @@ search.addEventListener('click', () => {
         return;
 
     fetch(`http://api.weatherapi.com/v1/current.json?key=${APIKey}&q=${city}&aqi=no`)
-        .then(response => response.json()).then(json => {
-
-        if (json.cod === '404') {
-            container.style.height = '400px';
-            weatherBox.style.display = 'none';
-            weatherDetails.style.display = 'none';
-            error404.style.display = 'block';
-            error404.classList.add('fadeIn');
-            return;
-        }
+        .then(response => {
+                if (response.status === 400) {
+                    throw new Error();
+                } else {
+                    return response.json();
+                }
+            }
+        ).then(json => {
 
         error404.style.display = 'none';
         error404.classList.remove('fadeIn');
@@ -37,6 +35,7 @@ search.addEventListener('click', () => {
             case 'Clear':
                 image.src = 'images/clear.png';
                 break;
+            case 'Light rain':
             case 'Rain':
                 image.src = 'images/rain.png';
                 break;
@@ -45,8 +44,11 @@ search.addEventListener('click', () => {
                 image.src = 'images/snow.png';
                 break;
             case 'Partly cloudy':
-            case 'Clouds':
                 image.src = 'images/cloud.png';
+                break;
+            case 'Overcast':
+            case 'Clouds':
+                image.src = 'images/overcast.png';
                 break;
             case 'Haze':
                 image.src = 'images/haze.png';
@@ -65,5 +67,12 @@ search.addEventListener('click', () => {
         weatherBox.classList.add('fadeIn');
         weatherDetails.classList.add('fadeIn');
         container.style.height = '590px';
+
+    }).catch(() => {
+        container.style.height = '400px';
+        weatherBox.style.display = 'none';
+        weatherDetails.style.display = 'none';
+        error404.style.display = 'block';
+        error404.classList.add('fadeIn');
     })
 })
